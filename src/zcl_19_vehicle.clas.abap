@@ -1,6 +1,5 @@
 CLASS zcl_19_vehicle DEFINITION
   PUBLIC
-  FINAL
   CREATE PUBLIC .
 
   PUBLIC SECTION.
@@ -17,7 +16,8 @@ CLASS zcl_19_vehicle DEFINITION
    methods:
 
       accelerate importing value type i raising zcx_19_value_too_high,
-      brake importing value type i raising zcx_19_value_too_high.
+      brake importing value type i raising zcx_19_value_too_high,
+      to_string returning value(string) type string.
 
 
       CLASS-DATA number_of_vehicles type i READ-ONLY.
@@ -56,6 +56,10 @@ CLASS zcl_19_vehicle IMPLEMENTATION.
     me->model = model.
 
     number_of_vehicles += 1.
+  ENDMETHOD.
+
+  METHOD to_string.
+    string = |{ make } { model } ({ speed_in_kmh }km/h) |.
   ENDMETHOD.
 
 ENDCLASS.
