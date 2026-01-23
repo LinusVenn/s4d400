@@ -1,0 +1,57 @@
+managed implementation in class zbp_19_movie unique;
+strict ( 2 );
+
+define behavior for ZR_19_MovieTP alias Movie
+persistent table zabap_movie_a
+lock master
+authorization master ( instance )
+//etag master <field_name>
+{
+  create ( authorization : global );
+  update;
+  delete;
+  association _Ratings { create; }
+  field ( readonly, numbering : managed ) MovieUuid;
+  field (mandatory : create ) Title, Genre, PublishingYear, RuntimeInMin;
+  field (readonly:update) Title, Genre, PublishingYear, RuntimeInMin;
+  field (readonly) CreatedAt, CreatedBy, LastChangedAt, LastChangedBy;
+
+  validation ValidateGenre on save { create; }
+
+  action RateMovie parameter ZA_19_Rating; //result [1] $self;
+
+
+  mapping for zabap_movie_a corresponding {
+    MovieUuid = movie_uuid;
+    PublishingYear = publishing_year;
+    RuntimeInMin = runtime_in_min;
+    CreatedAt = created_at;
+    CreatedBy = created_by;
+    LastChangedAt = last_changed_at;
+    LastChangedBy = last_changed_by;
+  }
+
+}
+
+define behavior for ZR_19_RatingTP alias Rating
+persistent table zabap_rating_a
+lock dependent by _Movie
+authorization dependent by _Movie
+//etag master <field_name>
+{
+  update;
+  delete;
+  association _Movie;
+  field ( readonly, numbering : managed ) RatingUuid;
+  field ( readonly ) MovieUuid, RatingDate, UserName;
+
+  determination DetermineUserName on save {create; }
+  determination DetermineRatingDate on save {create; }
+
+mapping for zabap_rating_a corresponding {
+    RatingUuid = rating_uuid;
+    MovieUuid = movie_uuid;
+    UserName = user_name;
+    RatingDate = rating_date;
+  }
+}
